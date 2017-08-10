@@ -1,12 +1,12 @@
 {
   "name": "pdf-export",
   "version": "1.0.0",
-  "description": "",
+  "description": "Export webpage to pdf",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "mozily.qq.com",
   "license": "ISC",
   "dependencies": {
     "chrome-remote-interface": "^0.24.3"
