@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "types": ["node"],
+    "baseUrl": "./",
+    "paths": {
+      "chrome-remote-interface": ["typings/chrome-remote-interface"]
+    },
+    "module": "commonjs",
+    "outDir": "./dist",
+    "target": "es2017",
+    "lib": [
+      "es2017", "scripthost"
+    ],
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "sourceMap": true,
+    "watch": true
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

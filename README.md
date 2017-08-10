@@ -1,0 +1,1 @@
+对于在客户端渲染的界面，需要在渲染完成后调用`window.__notifyPageRenderFinished__();`来通知导出组件。

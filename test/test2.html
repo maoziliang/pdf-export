@@ -1,0 +1,27 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+
+</body>
+<script>
+  let i = 0;
+  setInterval(() => {
+    document.body.innerHTML += '<div>test2动态内容' + i + '</div>';
+    i++;
+  }, 1000);
+  window.onload = function () {
+    setTimeout(() => {
+      document.body.innerHTML += '<h1>b: ' + window.__pageRenderFinishedPromise__ + ', ' + window.__notifyPageRenderFinished__ + '</h1>';
+      if (window.__notifyPageRenderFinished__) {
+        document.body.innerHTML += '<h1>22222</h1>'
+        window.__notifyPageRenderFinished__();
+      }
+    }, 3001);
+  };
+</script>
+</html>
