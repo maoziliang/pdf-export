@@ -10,16 +10,15 @@ interface IPDFExportOptions extends CDP.ICDPOptions {
 
 export default class PDFExport {
   private options: IPDFExportOptions = null;
-  private cookies: CDP.ICookieItem[] = [];
   constructor(options: IPDFExportOptions) {
     this.options = options;
     this.options.timeout = this.options.timeout || 3000;
   }
 
-  private _chromeProcessPromise: Promise<ChildProcess> = null;
+  static _chromeProcessPromise: Promise<ChildProcess> = null;
   private async spawnChrome(): Promise<ChildProcess> {
-    if (this._chromeProcessPromise === null) {
-      this._chromeProcessPromise = new Promise(async resolve => {
+    if (PDFExport._chromeProcessPromise === null) {
+      PDFExport._chromeProcessPromise = new Promise(async resolve => {
         const process = spawn(this.options.chromeBin, [
           `--remote-debugging-port=${this.options.port}`,
           '--headless',
@@ -37,7 +36,7 @@ export default class PDFExport {
         }
       });
     }
-    return this._chromeProcessPromise;
+    return PDFExport._chromeProcessPromise;
   }
 
   private injectDetectScript(client: CDP.ICDPClient): Promise<any> {
@@ -72,21 +71,9 @@ export default class PDFExport {
     ]).then(console.log);
   }
 
-  /**
-   * 设置网络请求的cookies
-   *
-   * @param {CDP.ICookieItem[]} cookies
-   * @memberof PDFExport
-   */
-  public setCookies(cookies: CDP.ICookieItem[]) {
-    if (cookies !== null) {
-      this.cookies = cookies;
-    }
-  }
-
-  private async setClientCookies(client: CDP.ICDPClient) {
+  private async setClientCookies(client: CDP.ICDPClient, cookies: CDP.ICookieItem[]) {
     await client.Network.clearBrowserCookies();
-    await Promise.all(this.cookies.map(cookieItem =>
+    await Promise.all(cookies.map(cookieItem =>
       client.Network.setCookie(cookieItem),
     ));
   }
@@ -97,16 +84,23 @@ export default class PDFExport {
    * @returns {Promise<Buffer>}
    * @memberof PDFExport
    */
-  public async export(url: string): Promise<Buffer> {
+  public async export(options: {
+    url: string,
+    cookies?: CDP.ICookieItem[],
+  }): Promise<Buffer> {
+    if (!options.url) {
+      throw new Error('options.url is required');
+    }
+    options.cookies = options.cookies || [];
     await this.spawnChrome();
     const { host, port } = this.options;
     const target = await CDP.New({ host, port });
     const client = await CDP({ host, port, target });
     try {
-      await this.setClientCookies(client);
+      await this.setClientCookies(client, options.cookies || []);
       await client.Page.enable();
       await this.injectDetectScript(client);
-      await client.Page.navigate({ url });
+      await client.Page.navigate({ url: options.url });
       await client.Page.loadEventFired();
       await this.waitForRenderFinished(client);
       const base64Data = await client.Page.printToPDF();
@@ -125,7 +119,7 @@ export default class PDFExport {
    * 清理资源
    */
   public async dispose() {
-    const chromeProcess = await this._chromeProcessPromise;
+    const chromeProcess = await PDFExport._chromeProcessPromise;
     chromeProcess.kill();
   }
 }

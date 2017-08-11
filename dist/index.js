@@ -7,19 +7,18 @@ const timeout = async (mis) => new Promise(resolve => setTimeout(resolve, mis));
 class PDFExport {
     constructor(options) {
         this.options = null;
-        this.cookies = [];
-        this._chromeProcessPromise = null;
         this.options = options;
         this.options.timeout = this.options.timeout || 3000;
     }
     async spawnChrome() {
-        if (this._chromeProcessPromise === null) {
-            this._chromeProcessPromise = new Promise(async (resolve) => {
+        if (PDFExport._chromeProcessPromise === null) {
+            PDFExport._chromeProcessPromise = new Promise(async (resolve) => {
                 const process = child_process_1.spawn(this.options.chromeBin, [
                     `--remote-debugging-port=${this.options.port}`,
                     '--headless',
                 ]);
                 let started = false;
+                // 通过尝试连接端口，探测chrome是否启动成功
                 while (!started) {
                     try {
                         await timeout(200);
@@ -32,7 +31,7 @@ class PDFExport {
                 }
             });
         }
-        return this._chromeProcessPromise;
+        return PDFExport._chromeProcessPromise;
     }
     injectDetectScript(client) {
         return client.Page.addScriptToEvaluateOnLoad({
@@ -64,20 +63,9 @@ class PDFExport {
             timeout(this.options.timeout).then(() => 'timeout for waiting rendering.'),
         ]).then(console.log);
     }
-    /**
-     * 设置网络请求的cookies
-     *
-     * @param {CDP.ICookieItem[]} cookies
-     * @memberof PDFExport
-     */
-    setCookies(cookies) {
-        if (cookies !== null) {
-            this.cookies = cookies;
-        }
-    }
-    async setClientCookies(client) {
+    async setClientCookies(client, cookies) {
         await client.Network.clearBrowserCookies();
-        await Promise.all(this.cookies.map(cookieItem => client.Network.setCookie(cookieItem)));
+        await Promise.all(cookies.map(cookieItem => client.Network.setCookie(cookieItem)));
     }
     /**
      * 导出url指向的网页
@@ -86,16 +74,20 @@ class PDFExport {
      * @returns {Promise<Buffer>}
      * @memberof PDFExport
      */
-    async export(url) {
+    async export(options) {
+        if (!options.url) {
+            throw new Error('options.url is required');
+        }
+        options.cookies = options.cookies || [];
         await this.spawnChrome();
         const { host, port } = this.options;
         const target = await CDP.New({ host, port });
         const client = await CDP({ host, port, target });
         try {
-            await this.setClientCookies(client);
+            await this.setClientCookies(client, options.cookies || []);
             await client.Page.enable();
             await this.injectDetectScript(client);
-            await client.Page.navigate({ url });
+            await client.Page.navigate({ url: options.url });
             await client.Page.loadEventFired();
             await this.waitForRenderFinished(client);
             const base64Data = await client.Page.printToPDF();
@@ -115,9 +107,10 @@ class PDFExport {
      * 清理资源
      */
     async dispose() {
-        const chromeProcess = await this._chromeProcessPromise;
+        const chromeProcess = await PDFExport._chromeProcessPromise;
         chromeProcess.kill();
     }
 }
+PDFExport._chromeProcessPromise = null;
 exports.default = PDFExport;
 //# sourceMappingURL=index.js.map
