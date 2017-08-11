@@ -7,11 +7,9 @@ For client side rendered webpage. You should invoke `window.__notifyPageRenderFi
 
     contstructor an exporter instance.
 
-1. setCookies(cookies: ICookieItem[]): void
+1. export({ url: string, cookies?: ICookieItem[] }): Promise<Buffer>
 
-    Set cookies for chrome network request.
-
-1. export(url: string): Promise<Buffer>
+    Visit the url with the given cookies.
 
 1. dispose():void
 
