@@ -1,14 +1,14 @@
 {
   "name": "pdf-export",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Export webpage to pdf",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/maoziliang/pdf-export"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maoziliang/pdf-export"
   },
   "author": "mozily.qq.com",
   "license": "ISC",
