@@ -3,15 +3,12 @@ const PDFExportor = require('../dist').default;
 const exporter = new PDFExportor({
   host: 'localhost',
   port: 9333,
-  chromeBin: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  chromeBin: '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary',
   timeout: 5000,
 });
 
 async function main() {
   Promise.all([
-    exporter.export({ url: 'http://localhost:8082/test1.html' }).then(buffer => {
-      fs.writeFileSync('test1.pdf', buffer);
-    }),
     exporter.export({ url: 'http://localhost:8082/test2.html' }).then(buffer => {
       fs.writeFileSync('test2.pdf', buffer);
     }),

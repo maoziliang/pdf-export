@@ -19,10 +19,13 @@ export default class PDFExport {
   private async spawnChrome(): Promise<ChildProcess> {
     if (PDFExport._chromeProcessPromise === null) {
       PDFExport._chromeProcessPromise = new Promise(async resolve => {
-        const process = spawn(this.options.chromeBin, [
+        const p = spawn(this.options.chromeBin, [
           `--remote-debugging-port=${this.options.port}`,
+          '--disable-extensions',
           '--headless',
         ]);
+        p.stdout.pipe(process.stdout);
+        p.stderr.pipe(process.stderr);
         let started = false;
         // 通过尝试连接端口，探测chrome是否启动成功
         while (!started) {
@@ -31,7 +34,7 @@ export default class PDFExport {
             const client = await CDP(this.options);
             started = true;
             client.close();
-            resolve(process);
+            resolve(p);
           } catch (e) {}
         }
       });
@@ -97,8 +100,18 @@ export default class PDFExport {
     const target = await CDP.New({ host, port });
     const client = await CDP({ host, port, target });
     try {
+      await Promise.all([
+        client.Security.enable(),
+        client.Page.enable(),
+        client.Network.enable(),
+        client.Runtime.enable(),
+      ]);
+
+      await client.Security.setOverrideCertificateErrors({ override: true });
+      client.Security.certificateError().then(({ eventId }) => {
+        client.Security.handleCertificateError({ eventId, action: 'continue' });
+      });
       await this.setClientCookies(client, options.cookies || []);
-      await client.Page.enable();
       await this.injectDetectScript(client);
       await client.Page.navigate({ url: options.url });
       await client.Page.loadEventFired();

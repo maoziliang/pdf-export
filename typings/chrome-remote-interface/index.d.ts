@@ -128,6 +128,7 @@ interface IPage {
 }
 
 interface IRuntime {
+  enable(): Promise<void>;
   evaluate(options: {
     expression: string,
     objectGroup?: string,
@@ -146,6 +147,14 @@ interface INetwork {
   clearBrowserCookies(): Promise<{ result: boolean }>;
   setCookie(cookieItem: CDP.ICookieItem): Promise<{ success: boolean }>;
   setUserAgentOverride(options: { userAgent: string}): Promise<void>;
+  enable(): Promise<void>;
+}
+
+interface ISecurity {
+  certificateError(): Promise<{ eventId: number, errorType: string, requestURL: string}>;
+  enable(): Promise<void>;
+  handleCertificateError(options: { eventId: number, action: 'continue'|'cancel' }): Promise<void>;
+  setOverrideCertificateErrors(options: { override: boolean }): Promise<void>;
 }
 
 declare function CDP(options: CDP.ICDPOptions): Promise<CDP.ICDPClient>;
@@ -172,6 +181,7 @@ declare namespace CDP {
     Page: IPage;
     Runtime: IRuntime;
     Network: INetwork;
+    Security: ISecurity;
   }
 
   interface ICookieItem {
