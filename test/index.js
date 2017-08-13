@@ -9,10 +9,13 @@ const exporter = new PDFExportor({
 
 async function main() {
   Promise.all([
+    exporter.export({ url: 'http://localhost:8082/test1.html', pdfOptions: { printBackground: true } }).then(buffer => {
+      fs.writeFileSync('test1.pdf', buffer);
+    }),
     exporter.export({ url: 'http://localhost:8082/test2.html' }).then(buffer => {
       fs.writeFileSync('test2.pdf', buffer);
     }),
-    exporter.export({ url: 'http://localhost:8082/test1.html' }).then(buffer => {
+    exporter.export({ url: 'http://localhost:8082/test1.html', pdfOptions: { printBackground: true } }).then(buffer => {
       fs.writeFileSync('test3.pdf', buffer);
     }),
     exporter.export({ url: 'http://localhost:8082/test2.html' }).then(buffer => {

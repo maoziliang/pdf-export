@@ -90,6 +90,7 @@ export default class PDFExport {
   public async export(options: {
     url: string,
     cookies?: CDP.ICookieItem[],
+    pdfOptions?: CDP.IPrintToPDFOptions,
   }): Promise<Buffer> {
     if (!options.url) {
       throw new Error('options.url is required');
@@ -116,7 +117,7 @@ export default class PDFExport {
       await client.Page.navigate({ url: options.url });
       await client.Page.loadEventFired();
       await this.waitForRenderFinished(client);
-      const base64Data = await client.Page.printToPDF();
+      const base64Data = await client.Page.printToPDF(options.pdfOptions);
       const buffer = Buffer.from(base64Data.data, 'base64');
       return buffer;
     } catch(e) {

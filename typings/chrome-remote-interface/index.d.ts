@@ -65,52 +65,7 @@ interface IPage {
    * @memberof IPage
    */
   addScriptToEvaluateOnNewDocument(options: { source: string }): Promise<{ identifier: string }>;
-  printToPDF(options?: {
-    landscape?: Boolean;
-    displayHeaderFooter?: Boolean;
-    printBackground?: Boolean;
-    scale?: Number;
-    /**
-     * Paper width in inches. Defaults to 8.5 inches.
-     * @type {Number}
-     */
-    paperWidth?: Number;
-    /**
-     * Paper height in inches. Defaults to 11 inches.
-     * @type {Number}
-     */
-    paperHeight?: Number;
-    /**
-     * Top margin in inches. Defaults to 1cm (~0.4 inches).
-     * @type {Number}
-     */
-    marginTop?: Number;
-    /**
-     * Bottom margin in inches. Defaults to 1cm (~0.4 inches).
-     * @type {Number}
-     */
-    marginBottom?: Number;
-    /**
-     * Left margin in inches. Defaults to 1cm (~0.4 inches).
-     * @type {Number}
-     */
-    marginLeft?: Number;
-    /**
-     * Right margin in inches. Defaults to 1cm (~0.4 inches).
-     * @type {Number}
-     */
-    marginRight?: Number;
-    /**
-     * Paper ranges to print, e.g., '1-5, 8, 11-13'. Defaults to the empty string, which means print all pages.
-     * @type {Number}
-     */
-    pageRanges?: Number;
-    /**
-     * Whether to silently ignore invalid but successfully parsed page ranges, such as '3-2'. Defaults to false.
-     * @type {Boolean}
-     */
-    ignoreInvalidPageRanges?: Boolean;
-  }): Promise<{ data: string }>;
+  printToPDF(options?: CDP.IPrintToPDFOptions): Promise<{ data: string }>;
   bringToFront(): Promise<void>;
   /**
    * Navigates current page to the given URL.
@@ -191,6 +146,53 @@ declare namespace CDP {
     path?: string,
     httpOnly?: boolean,
     secure?: boolean,
+  }
+
+  interface IPrintToPDFOptions {
+    landscape?: Boolean;
+    displayHeaderFooter?: Boolean;
+    printBackground?: Boolean;
+    scale?: Number;
+    /**
+     * Paper width in inches. Defaults to 8.5 inches.
+     * @type {Number}
+     */
+    paperWidth?: Number;
+    /**
+     * Paper height in inches. Defaults to 11 inches.
+     * @type {Number}
+     */
+    paperHeight?: Number;
+    /**
+     * Top margin in inches. Defaults to 1cm (~0.4 inches).
+     * @type {Number}
+     */
+    marginTop?: Number;
+    /**
+     * Bottom margin in inches. Defaults to 1cm (~0.4 inches).
+     * @type {Number}
+     */
+    marginBottom?: Number;
+    /**
+     * Left margin in inches. Defaults to 1cm (~0.4 inches).
+     * @type {Number}
+     */
+    marginLeft?: Number;
+    /**
+     * Right margin in inches. Defaults to 1cm (~0.4 inches).
+     * @type {Number}
+     */
+    marginRight?: Number;
+    /**
+     * Paper ranges to print, e.g., '1-5, 8, 11-13'. Defaults to the empty string, which means print all pages.
+     * @type {Number}
+     */
+    pageRanges?: Number;
+    /**
+     * Whether to silently ignore invalid but successfully parsed page ranges, such as '3-2'. Defaults to false.
+     * @type {Boolean}
+     */
+    ignoreInvalidPageRanges?: Boolean;
   }
 
   export function List(options: ICDPListOptions): Promise<ITargetInfo[]>;
