@@ -4,3 +4,5 @@ src
 typings
 tsconfig.json
 .git
+*.pdf
+*.tar.gz
