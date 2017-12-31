@@ -1,4 +1,4 @@
-import CDP = require('chrome-remote-interface');
+import CDP = require('./chrome-remote-interface');
 
 export = PDFExport;
 

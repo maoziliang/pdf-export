@@ -15,8 +15,7 @@
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
-    "sourceMap": true,
-    "watch": true
+    "sourceMap": true
   },
   "include": [
     "src/**/*"
